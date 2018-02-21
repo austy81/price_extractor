@@ -31,7 +31,7 @@ class HtmlExtractor():
             if verify_not_exists is not None:
                 try:
                     self.driver.find_element_by_xpath(verify_not_exists)
-                    return 'n/a not'
+                    return 'n/a'
                 except:
                     pass
 
