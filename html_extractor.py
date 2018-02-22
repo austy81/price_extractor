@@ -2,8 +2,6 @@ from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from time import strftime
 import re
-import logging
-
 
 class HtmlExtractor():
 

@@ -1,12 +1,13 @@
 from openpyxl import load_workbook
-from time import strftime
+import time
+import logging
 
 class excel:
 
     def __init__(self, input_xslx_file, output_xslx_file, insert_sheet_name):
         self.in_wb = load_workbook(input_xslx_file)
         self.output_xslx_file = output_xslx_file
-        self.insert_sheet_name = "{}-{}".format(insert_sheet_name,strftime("%Y %d. %m. %H.%M.%S"))
+        self.insert_sheet_name = "{}-{}".format(insert_sheet_name,time.strftime("%Y %d. %m. %H.%M.%S"))
 
     def get_column_values(self, sheet_name,url_column,skip_first_line=True):
         sheet = self.in_wb[sheet_name]
@@ -42,13 +43,13 @@ class excel:
         ws = self.out_wb[self.insert_sheet_name]
         for parser_urls in results:
             for row in parser_urls["urls"]:
-                    ws.cell(row=row["row_number"], column=1, value=row["url"])
-                    ws.cell(row=row["row_number"], column=2, value=row["price"])
+                ws.cell(row=row["row_number"], column=1, value=row["url"])
+                ws.cell(row=row["row_number"], column=2, value=row["price"])
         while True:
             try:
                 self.out_wb.save(self.output_xslx_file)
                 break
             except:
-                print('Save failed. Retrying...')
+                logging.info('Save failed. Retrying...')
                 time.sleep(5)
         
