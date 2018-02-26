@@ -1,4 +1,4 @@
-from openpyxl import load_workbook
+from openpyxl import load_workbook, Workbook
 import time
 import logging
 
@@ -38,7 +38,13 @@ class excel:
         return parsers
 
     def save_in_excel(self, results):
-        self.out_wb = load_workbook(self.output_xslx_file)
+        try:
+            self.out_wb = load_workbook(self.output_xslx_file)
+        except:
+            logging.warn("Excel workbook {} was not found.".format(self.output_xslx_file))
+            logging.info("Creating new workbook.")
+            self.out_wb = Workbook()
+
         self.out_wb.create_sheet(title=self.insert_sheet_name)
         ws = self.out_wb[self.insert_sheet_name]
         for parser_urls in results:
@@ -52,4 +58,5 @@ class excel:
             except:
                 logging.info('Save failed. Retrying...')
                 time.sleep(5)
+        logging.info("Output excel file {} was saved.".format(self.output_xslx_file))
         

@@ -10,13 +10,14 @@ from html_extractor import HtmlExtractor
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s %(levelname)s %(message)s'
+    # ,filename="robot_extractor.log"
     )
 
 def main():
     input_xlsx_file = "in.xlsx"
     output_xslx_file = "out.xlsx"
     insert_sheet_name = "results"
-    logging.info("Loading input Excel...")
+    logging.info("Loading input Excel...{}".format(input_xlsx_file))
     my_excel = excel(input_xlsx_file, output_xslx_file, insert_sheet_name)
     urls = my_excel.get_column_values(sheet_name="urls",url_column=3)
     logging.info("{} urls loaded.".format(len(urls)))
