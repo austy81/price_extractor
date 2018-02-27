@@ -38,6 +38,9 @@ class excel:
         return parsers
 
     def save_in_excel(self, results):
+        if len(results) == 0:
+            logging.warning("Nothing to save.")
+            return
         try:
             self.out_wb = load_workbook(self.output_xslx_file)
         except:
