@@ -62,7 +62,8 @@ def main():
     pool.close()
     pool.join()
     logging.info("Saving results to excel.")
-    my_excel.save_in_excel(result_set.get())
+    my_excel.save_in_excel(result_set)
+    #my_excel.save_in_excel(result_set.get())
     logging.info("DONE")
 
 def process_urls_for_parser(parser_urls):
