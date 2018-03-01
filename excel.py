@@ -2,14 +2,16 @@ from openpyxl import load_workbook, Workbook
 import time
 import logging
 
+
 class excel:
 
     def __init__(self, input_xslx_file, output_xslx_file, insert_sheet_name):
         self.in_wb = load_workbook(input_xslx_file)
         self.output_xslx_file = output_xslx_file
-        self.insert_sheet_name = "{}-{}".format(insert_sheet_name,time.strftime("%Y %d. %m. %H.%M.%S"))
+        self.insert_sheet_name = "{}-{}".format(
+            insert_sheet_name, time.strftime("%Y %d. %m. %H.%M.%S"))
 
-    def get_column_values(self, sheet_name,url_column,skip_first_line=True):
+    def get_column_values(self, sheet_name, url_column, skip_first_line=True):
         sheet = self.in_wb[sheet_name]
         urls = []
         for row in sheet:
@@ -17,9 +19,10 @@ class excel:
                 continue
             if row[url_column].value is None:
                 break
-            urls.append({"row_number": row[url_column].row , "url":row[url_column].value})
+            urls.append(
+                {"row_number": row[url_column].row, "url": row[url_column].value})
         return urls
-    
+
     def get_parsers(self, sheet_name, skip_first_line=True):
         ws = self.in_wb[sheet_name]
         parsers = []
@@ -31,10 +34,10 @@ class excel:
             cur_row = str(row[0].row)
 
             parsers.append(
-                {'url_regex': ws['A'+cur_row].value, 
-                'price_element': ws['B'+cur_row].value, 
-                'verify_exists': ws['C'+cur_row].value,
-                'verify_not_exists': ws['D'+cur_row].value})
+                {'url_regex': ws['A' + cur_row].value,
+                 'price_element': ws['B' + cur_row].value,
+                 'verify_exists': ws['C' + cur_row].value,
+                 'verify_not_exists': ws['D' + cur_row].value})
         return parsers
 
     def save_in_excel(self, results):
@@ -43,8 +46,9 @@ class excel:
             return
         try:
             self.out_wb = load_workbook(self.output_xslx_file)
-        except:
-            logging.warn("Excel workbook {} was not found.".format(self.output_xslx_file))
+        except Exception:
+            logging.warn("Excel workbook {} was not found.".format(
+                self.output_xslx_file))
             logging.info("Creating new workbook.")
             self.out_wb = Workbook()
 
@@ -58,8 +62,8 @@ class excel:
             try:
                 self.out_wb.save(self.output_xslx_file)
                 break
-            except:
+            except Exception:
                 logging.info('Save failed. Retrying...')
                 time.sleep(5)
-        logging.info("Output excel file {} was saved.".format(self.output_xslx_file))
-        
+        logging.info("Output excel file {} was saved.".format(
+            self.output_xslx_file))
