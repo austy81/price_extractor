@@ -2,25 +2,21 @@ import parser_matcher
 import time
 import multiprocessing
 import logging
+import os.path
 
 from excel import excel
 from html_extractor import HtmlExtractor
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s %(levelname)s %(message)s'
-    # ,filename="robot_extractor.log"
-)
-
 
 def main():
-    input_xlsx_file = "in.xlsx"
-    output_xslx_file = "out.xlsx"
+    input_xlsx_file = r"excel\in.xlsx"
+    output_xslx_file = r"excel\out.xlsx"
     insert_sheet_name = "results"
     url_column = 0
     url_sheet_name = "urls"
     parsers_sheet_name = "settings"
 
+    setup_logging()
     logging.info("Loading input Excel...{}".format(input_xlsx_file))
     my_excel = excel(input_xlsx_file, output_xslx_file, insert_sheet_name)
 
@@ -52,25 +48,24 @@ def main():
     logging.info("------------------------------------------")
 
     # Version without progress reporting
-    pool = multiprocessing.Pool(multiprocessing.cpu_count() * 2)
-    result_set = pool.map(process_urls_for_parser, matched_urls)
+    # pool = multiprocessing.Pool(multiprocessing.cpu_count())
+    # result_set = pool.map(process_urls_for_parser, matched_urls)
+    # logging.info("Saving results to excel.")
+    # my_excel.save_in_excel(result_set)
 
-    # pool = multiprocessing.Pool()
-    # result_set = pool.map_async(process_urls_for_parser, matched_urls)
-    # remaining_tasks = 0
-    # while (True):
-    #     if (result_set.ready()):
-    #         break
-    #     if remaining_tasks != result_set._number_left:
-    #         logging.info("Waiting for {} batches to complete...".format(result_set._number_left))
-    #         remaining_tasks = result_set._number_left
-    #     time.sleep(1)
-
+    pool = multiprocessing.Pool()
+    result_set = pool.map_async(process_urls_for_parser, matched_urls)
     pool.close()
-    pool.join()
+    remaining_tasks = 0
+    while (True):
+        if (result_set.ready()):
+            break
+        if remaining_tasks != result_set._number_left:
+            logging.info("Waiting for {} batches to complete...".format(result_set._number_left))
+            remaining_tasks = result_set._number_left
+        time.sleep(1)
     logging.info("Saving results to excel.")
-    my_excel.save_in_excel(result_set)
-    # my_excel.save_in_excel(result_set.get())
+    my_excel.save_in_excel(result_set.get())
     logging.info("DONE")
 
 
@@ -92,6 +87,25 @@ def process_urls_for_parser(parser_urls):
     logging.info("FINISHED {:4d} urls in {:4d} seconds - {:6.2f} s/url [{}]".format(
         url_count, int(elapsed_time), s_per_url, parser_urls["parser"]["url_regex"]))
     return parser_urls
+
+
+def setup_logging():
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    # create console handler and set level to debug
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s %(message)s')
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+    # create file handler
+    logs_dir = "logs"
+    if not os.path.exists(logs_dir):
+        os.makedirs(logs_dir)
+    file_handler = logging.FileHandler(r'logs/price_robot.log')
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
 
 
 if __name__ == '__main__':

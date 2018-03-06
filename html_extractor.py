@@ -37,9 +37,9 @@ class HtmlExtractor():
                 price_element).text.encode('ascii', errors='ignore')
             return_val = "'{}' error parsing price".format(element_text)
             return self._get_price(element_text)
-        except Exception, e:
+        except Exception:
             # self.driver.save_screenshot('screenshots/screenshot_{}.png'.format(strftime("%Y_%m_%d_%H_%M_%S")))
-            return "{} Exception:{}".format(return_val, repr(e))
+            return return_val
 
     def _get_price(self, text):
         nums = re.findall(r"\d+", text.replace(" ", ""))
