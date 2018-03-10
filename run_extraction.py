@@ -6,6 +6,7 @@ import os.path
 
 from excel import excel
 from html_extractor import HtmlExtractor
+# from raw_html_extractor import HtmlExtractor
 
 
 def main():
@@ -48,24 +49,33 @@ def main():
     logging.info("------------------------------------------")
 
     # Version without progress reporting
-    # pool = multiprocessing.Pool(multiprocessing.cpu_count())
-    # result_set = pool.map(process_urls_for_parser, matched_urls)
+    pool = multiprocessing.Pool()
+    result_set = pool.map(process_urls_for_parser, matched_urls)
+    logging.info("Saving results to excel.")
+    my_excel.save_in_excel(result_set)
+
+    # single thread
+    # result_set = map(process_urls_for_parser, matched_urls)
+    # result_set = []
+    # for urls in matched_urls:
+    #     result_set.append(process_urls_for_parser(urls))
     # logging.info("Saving results to excel.")
     # my_excel.save_in_excel(result_set)
 
-    pool = multiprocessing.Pool()
-    result_set = pool.map_async(process_urls_for_parser, matched_urls)
-    pool.close()
-    remaining_tasks = 0
-    while (True):
-        if (result_set.ready()):
-            break
-        if remaining_tasks != result_set._number_left:
-            logging.info("Waiting for {} batches to complete...".format(result_set._number_left))
-            remaining_tasks = result_set._number_left
-        time.sleep(1)
-    logging.info("Saving results to excel.")
-    my_excel.save_in_excel(result_set.get())
+    # pool = multiprocessing.Pool()
+    # result_set = pool.map_async(process_urls_for_parser, matched_urls)
+    # pool.close()
+    # remaining_tasks = 0
+    # while (True):
+    #     if (result_set.ready()):
+    #         break
+    #     if remaining_tasks != result_set._number_left:
+    #         logging.info("Waiting for {} batches to complete...".format(result_set._number_left))
+    #         remaining_tasks = result_set._number_left
+    #     time.sleep(1)
+    # logging.info("Saving results to excel.")
+    # my_excel.save_in_excel(result_set.get())
+
     logging.info("DONE")
 
 
@@ -78,13 +88,14 @@ def process_urls_for_parser(parser_urls):
             url["price"] = extractor.get_element_text(
                 url=url["url"],
                 parser=parser_urls["parser"])
-        except Exception, e:
-            logging.error("EXCEPT {}".format(str(e)))
+        except Exception as e:
+            logging.error("EXCEPT {}".format(repr(e)))
+            url["price"] = repr(e)
     extractor.quit()
     elapsed_time = time.time() - start_time
     url_count = len(parser_urls["urls"])
     s_per_url = elapsed_time / url_count
-    logging.info("FINISHED {:4d} urls in {:4d} seconds - {:6.2f} s/url [{}]".format(
+    print("FINISHED {:4d} urls in {:4d} seconds - {:6.2f} s/url [{}]".format(
         url_count, int(elapsed_time), s_per_url, parser_urls["parser"]["url_regex"]))
     return parser_urls
 
@@ -109,5 +120,5 @@ def setup_logging():
 
 
 if __name__ == '__main__':
+    multiprocessing.freeze_support()
     main()
-    # C:\Python27\python.exe run_extraction.py

@@ -57,7 +57,11 @@ class excel:
         for parser_urls in results:
             for row in parser_urls["urls"]:
                 ws.cell(row=row["row_number"], column=1, value=row["url"])
-                ws.cell(row=row["row_number"], column=2, value=row["price"])
+                try:
+                    ws.cell(row=row["row_number"], column=2, value=row["price"])
+                except Exception as e:
+                    ws.cell(row=row["row_number"], column=2, value=repr(e))
+                
         while True:
             try:
                 self.out_wb.save(self.output_xslx_file)
