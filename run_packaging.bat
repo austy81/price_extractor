@@ -1,4 +1,4 @@
-C:\python27\python pyinstaller --onefile run_extraction.py
+pyinstaller --onefile run_extraction.py
 copy phantomjs.exe dist
 mkdir dist\excel
 copy excel dist\excel

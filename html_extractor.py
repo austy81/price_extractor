@@ -51,6 +51,7 @@ class HtmlExtractor():
             return return_val
 
     def _get_price(self, text):
+        text = text.decode('utf-8')
         nums = re.findall(r"\d+", text.replace(" ", ""))
         if len(nums) == 0:
             return "price element does not contain numbers"

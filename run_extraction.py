@@ -3,6 +3,7 @@ import time
 import multiprocessing
 import logging
 import os.path
+import datetime
 from excel import excel
 from html_extractor import HtmlExtractor
 # from raw_html_extractor import HtmlExtractor
@@ -79,8 +80,8 @@ def main():
 
 
 def process_urls_for_parser(parser_urls):
-    start_time = time.time()
     extractor = HtmlExtractor()
+    start_time = time.time()
     # logging.info("STARTING {:4d} urls [{}]".format(len(parser_urls["urls"]), parser_urls["parser"]["url_regex"]))
     for url in parser_urls["urls"]:
         try:
@@ -90,12 +91,12 @@ def process_urls_for_parser(parser_urls):
         except Exception as e:
             logging.error("EXCEPT {}".format(repr(e)))
             url["price"] = repr(e)
-    extractor.quit()
     elapsed_time = time.time() - start_time
+    extractor.quit()
     url_count = len(parser_urls["urls"])
     s_per_url = elapsed_time / url_count
-    print("FINISHED {:4d} urls in {:4d} seconds - {:6.2f} s/url [{}]".format(
-        url_count, int(elapsed_time), s_per_url, parser_urls["parser"]["url_regex"]))
+    print("{} FINISHED {:4d} urls in {:4d} seconds - {:6.2f} s/url [{}]".format(
+        datetime.datetime.now().isoformat(), url_count, int(elapsed_time), s_per_url, parser_urls["parser"]["url_regex"]))
     return parser_urls
 
 
@@ -119,5 +120,5 @@ def setup_logging():
 
 
 if __name__ == '__main__':
-    # multiprocessing.freeze_support()
+    multiprocessing.freeze_support()
     main()
