@@ -3,7 +3,6 @@ import time
 import multiprocessing
 import logging
 import os.path
-
 from excel import excel
 from html_extractor import HtmlExtractor
 # from raw_html_extractor import HtmlExtractor
@@ -120,5 +119,5 @@ def setup_logging():
 
 
 if __name__ == '__main__':
-    multiprocessing.freeze_support()
+    # multiprocessing.freeze_support()
     main()

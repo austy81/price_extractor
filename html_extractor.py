@@ -1,10 +1,20 @@
 from selenium import webdriver
 import re
+# from time import strftime
 
 
 class HtmlExtractor():
 
     def __init__(self):
+        # from selenium.webdriver.chrome.options import Options
+        # from selenium.webdriver.remote.remote_connection import LOGGER
+        # import logging
+        # LOGGER.setLevel(logging.ERROR)
+        # chrome_options = Options()
+        # chrome_options.add_argument("--headless")
+        # self.driver = webdriver.Chrome(chrome_options=chrome_options)
+        # self.driver.set_window_size(1120, 550)
+        
         self.driver = webdriver.PhantomJS()
         self.driver.set_window_size(1120, 550)
 
