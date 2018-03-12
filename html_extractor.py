@@ -14,7 +14,6 @@ class HtmlExtractor():
         # chrome_options.add_argument("--headless")
         # self.driver = webdriver.Chrome(chrome_options=chrome_options)
         # self.driver.set_window_size(1120, 550)
-        
         self.driver = webdriver.PhantomJS()
         self.driver.set_window_size(1120, 550)
 
