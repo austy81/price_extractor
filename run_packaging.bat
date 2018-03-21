@@ -4,5 +4,6 @@ mkdir dist\excel
 copy excel dist\excel
 cd dist
 run_extraction.exe
+excel\out.xlsx
 cd..
 pause

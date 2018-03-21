@@ -19,7 +19,11 @@ def _get_parser(url):
         match = re.search(parser["url_regex"], url)
         if match:
             return parser
-    return {"url_regex": None, "price_element":None, "verify_exists":None, "verify_not_exists":None}
+    return {"url_regex": None,
+            "price_element": None,
+            "verify_exists": None,
+            "verify_not_exists": None,
+            "parser_cell_fill_bg_color": '00FF0000'}
 
 
 def _get_values_list(dict):
