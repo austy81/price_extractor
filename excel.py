@@ -2,6 +2,7 @@ from openpyxl import load_workbook, Workbook
 from openpyxl.styles import Color, PatternFill, colors
 import time
 import logging
+from copy import copy
 
 
 class excel:
@@ -33,7 +34,6 @@ class excel:
             if row[0].value is None or row[0].value == "":
                 break
             row_no = str(row[0].row)
-
             url_cell = ws['A' + row_no]
 
             # this is fuck up in openpyxl
@@ -51,6 +51,39 @@ class excel:
         if len(results) == 0:
             logging.warning("Nothing to save.")
             return
+        ws = self._load_out_worksheet()
+        ws['A1'].value = "URL"
+        ws['B1'].value = "Price"
+        for parser_urls in results:
+            parser = parser_urls['parser']
+            for row in parser_urls["urls"]:
+                ws.cell(row=row["row_number"], column=1, value=row["url"])
+                try:
+                    cur_cell = ws['B'+str(row["row_number"])]
+                    cur_cell.fill = self._get_fill_color(parser, row['price']) 
+                    cur_cell.value = row['price'] if row['price'] else 'n/a'
+                except Exception as e:
+                    ws.cell(row=row["row_number"], column=2, value=repr(e))
+        self._save_workbook()
+
+    def _get_fill_color(self, parser, price):
+        if price:
+            return PatternFill("solid", parser['parser_cell_fill_bg_color']) 
+        return PatternFill("solid", fgColor=colors.YELLOW) 
+
+    def _save_workbook(self):
+        while True:
+            try:
+                self.out_wb.save(self.output_xslx_file)
+                break
+            except Exception:
+                logging.info('Save to file {} failed. Retrying...'.format(
+                            self.output_xslx_file))
+                time.sleep(5)
+        logging.info("Output excel file {} was saved.".format(
+            self.output_xslx_file))
+
+    def _load_out_worksheet(self):
         try:
             self.out_wb = load_workbook(self.output_xslx_file)
             logging.info("Output excel loaded.")
@@ -59,26 +92,5 @@ class excel:
                 self.output_xslx_file))
             logging.info("Creating new workbook.")
             self.out_wb = Workbook()
-
         self.out_wb.create_sheet(title=self.insert_sheet_name)
-        ws = self.out_wb[self.insert_sheet_name]
-        for parser_urls in results:
-            parser = parser_urls['parser']
-            for row in parser_urls["urls"]:
-                ws.cell(row=row["row_number"], column=1, value=row["url"])
-                try:
-                    cur_cell = ws['B'+str(row["row_number"])]
-                    cur_cell.fill = PatternFill("solid", parser['parser_cell_fill_bg_color'])
-                    cur_cell.value = row['price']
-                except Exception as e:
-                    ws.cell(row=row["row_number"], column=2, value=repr(e))
-
-        while True:
-            try:
-                self.out_wb.save(self.output_xslx_file)
-                break
-            except Exception:
-                logging.info('Save failed. Retrying...')
-                time.sleep(5)
-        logging.info("Output excel file {} was saved.".format(
-            self.output_xslx_file))
+        return self.out_wb[self.insert_sheet_name]
