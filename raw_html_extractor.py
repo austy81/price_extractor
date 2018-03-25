@@ -1,4 +1,6 @@
 import requests
+from lxml import html
+import extraction_result_error
 
 
 class HtmlExtractor():
@@ -11,9 +13,11 @@ class HtmlExtractor():
             r = requests.get(url)
             if r.status_code != 200:
                 return "error url"
-            return r.text
+            tree = html.fromstring(r.content)
+            price_element = tree.xpath(parser['price_element']+'/text()')
+            return price_element[0], None
         except Exception as e:
-            return repr(e)
+            return 'error', extraction_result_error.ERROR_PARSING_PRICE
 
     def quit(self):
         pass

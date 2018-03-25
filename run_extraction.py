@@ -5,8 +5,8 @@ import logging
 import os.path
 import datetime
 from excel import excel
-from html_extractor import HtmlExtractor
-# from raw_html_extractor import HtmlExtractor
+# from html_extractor import HtmlExtractor
+from raw_html_extractor import HtmlExtractor
 
 
 def main():
