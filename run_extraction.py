@@ -85,12 +85,12 @@ def process_urls_for_parser(parser_urls):
     # logging.info("STARTING {:4d} urls [{}]".format(len(parser_urls["urls"]), parser_urls["parser"]["url_regex"]))
     for url in parser_urls["urls"]:
         try:
-            url["price"] = extractor.get_element_text(
+            url["price"], url["note"] = extractor.get_element_text(
                 url=url["url"],
                 parser=parser_urls["parser"])
         except Exception as e:
             logging.error("EXCEPT {}".format(repr(e)))
-            url["price"] = repr(e)
+            url["note"] = repr(e)
     elapsed_time = time.time() - start_time
     extractor.quit()
     url_count = len(parser_urls["urls"])

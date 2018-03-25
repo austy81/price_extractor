@@ -2,7 +2,6 @@ from openpyxl import load_workbook, Workbook
 from openpyxl.styles import Color, PatternFill, colors
 import time
 import logging
-from copy import copy
 
 
 class excel:
@@ -54,23 +53,27 @@ class excel:
         ws = self._load_out_worksheet()
         ws['A1'].value = "URL"
         ws['B1'].value = "Price"
+        ws['C1'].value = "Error"
         for parser_urls in results:
             parser = parser_urls['parser']
             for row in parser_urls["urls"]:
+                error_text, result_color = row['note'] if row['note'] else (None, None)
+                priece_cell = ws['B'+str(row["row_number"])]
+
                 ws.cell(row=row["row_number"], column=1, value=row["url"])
                 try:
-                    cur_cell = ws['B'+str(row["row_number"])]
-                    cur_cell.fill = self._get_fill_color(parser, row['price']) 
-                    cur_cell.value = row['price'] if row['price'] else 'n/a'
+                    priece_cell.fill = PatternFill("solid", result_color) if result_color else PatternFill(
+                        "solid", fgColor=parser['parser_cell_fill_bg_color'])
+                    priece_cell.value = row['price'] if row['price'] else 'n/a'
                 except Exception as e:
                     ws.cell(row=row["row_number"], column=2, value=repr(e))
+                ws.cell(row=row["row_number"], column=3, value=error_text)
+
         self._save_workbook()
 
-    def _get_fill_color(self, parser, price):
-        if price:
-            return PatternFill("solid", parser['parser_cell_fill_bg_color']) 
-        return PatternFill("solid", fgColor=colors.YELLOW) 
-
+    def _get_fill_color(self, parser_color, result_color):
+        return PatternFill("solid", result_color) if result_color else PatternFill("solid", fgColor=parser_color)
+        
     def _save_workbook(self):
         while True:
             try:

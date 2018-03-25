@@ -1,6 +1,6 @@
 from selenium import webdriver
 import re
-# from time import strftime
+import extraction_result_error
 
 
 class HtmlExtractor():
@@ -20,32 +20,32 @@ class HtmlExtractor():
     def get_element_text(self, url, parser):
         price_element = parser['price_element']
         if price_element is None:
-            return "n/a"  # No parser
+            return None, extraction_result_error.NO_PARSER
         verify_exists = parser['verify_exists']
         verify_not_exists = parser['verify_not_exists']
 
         try:
-            return_val = None,  # 'error opening url'
+            return_val = None, extraction_result_error.ERROR_OPENING_URL
             self.driver.get(url)
 
-            if verify_exists is not None:
+            if verify_exists:
                 try:
                     self.driver.find_element_by_xpath(verify_exists)
                 except Exception:
-                    return None  # element which should exsist was not found
+                    return None, extraction_result_error.ELEMENT_SHOULD_EXIST
 
-            if verify_not_exists is not None:
+            if verify_not_exists:
                 try:
                     self.driver.find_element_by_xpath(verify_not_exists)
-                    return None  # found element which should not exist
+                    return None, extraction_result_error.ELEMENT_SHOULD_NOT_EXIST
                 except Exception:
                     pass
 
-            return_val = None  # 'error finding price on page'
+            return_val = None, extraction_result_error.ERROR_FINDING_PRICE
             element_text = self.driver.find_element_by_xpath(
                 price_element).text.encode('ascii', errors='ignore')
-            return_val = None  # "'{}' error parsing price".format(element_text)
-            return self._get_price(element_text)
+            return_val = None, extraction_result_error.ERROR_PARSING_PRICE
+            return self._get_price(element_text), None
         except Exception:
             # self.driver.save_screenshot('screenshots/screenshot_{}.png'.format(strftime("%Y_%m_%d_%H_%M_%S")))
             return return_val
