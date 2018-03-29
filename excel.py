@@ -1,5 +1,5 @@
 from openpyxl import load_workbook, Workbook
-from openpyxl.styles import Color, PatternFill, colors
+from openpyxl.styles import PatternFill, colors
 import time
 import logging
 
@@ -43,7 +43,8 @@ class excel:
                  'price_element': ws['B' + row_no].value,
                  'verify_exists': ws['C' + row_no].value,
                  'verify_not_exists': ws['D' + row_no].value,
-                 'parser_cell_fill_bg_color': bg})
+                 'parser_cell_fill_bg_color': bg,
+                 'parser_name': ws['E' + row_no].value})
         return parsers
 
     def save_in_excel(self, results):
@@ -73,7 +74,7 @@ class excel:
 
     def _get_fill_color(self, parser_color, result_color):
         return PatternFill("solid", result_color) if result_color else PatternFill("solid", fgColor=parser_color)
-        
+
     def _save_workbook(self):
         while True:
             try:

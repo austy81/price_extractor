@@ -5,3 +5,4 @@ ELEMENT_SHOULD_NOT_EXIST = 'Element which should exsist was not found', '00FFFF0
 ELEMENT_SHOULD_EXIST = 'Found element which should not exist', '00FFFF00'
 ERROR_FINDING_PRICE = 'Error finding price on page', '00FFFF00'
 ERROR_PARSING_PRICE = 'Error parsing price', '00FFFF00'
+ERROR_PARSING_PAGE = "Error parsing page", '00FFFF00'

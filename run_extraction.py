@@ -5,8 +5,8 @@ import logging
 import os.path
 import datetime
 from excel import excel
-# from html_extractor import HtmlExtractor
-from raw_html_extractor import HtmlExtractor
+from html_extractor import HtmlExtractor as e_selenium
+from raw_html_extractor import HtmlExtractor as e_requests
 
 
 def main():
@@ -43,13 +43,13 @@ def main():
         len(urls) - len(unmatched_urls)))
     logging.info("{} urls has no parser.".format(len(unmatched_urls)))
 
-    logging.info("{} processor cores found.".format(
-        multiprocessing.cpu_count()))
+    cpu_count = multiprocessing.cpu_count()
+    logging.info("{} processor cores found.".format(cpu_count))
     logging.info("ROBOT is STARTING the EXTRACTION")
     logging.info("------------------------------------------")
 
     # Version without progress reporting
-    pool = multiprocessing.Pool()
+    pool = multiprocessing.Pool(cpu_count)
     result_set = pool.map(process_urls_for_parser, matched_urls)
     logging.info("Saving results to excel.")
     my_excel.save_in_excel(result_set)
@@ -80,23 +80,29 @@ def main():
 
 
 def process_urls_for_parser(parser_urls):
-    extractor = HtmlExtractor()
     start_time = time.time()
+    parser_name = parser_urls['parser']['parser_name'] if parser_urls['parser']['parser_name'] else 'requests'
+    selected_extractor = e_requests() if parser_name == 'requests' else e_selenium()
     # logging.info("STARTING {:4d} urls [{}]".format(len(parser_urls["urls"]), parser_urls["parser"]["url_regex"]))
     for url in parser_urls["urls"]:
         try:
-            url["price"], url["note"] = extractor.get_element_text(
+            url["price"], url["note"] = selected_extractor.get_element_text(
                 url=url["url"],
                 parser=parser_urls["parser"])
         except Exception as e:
             logging.error("EXCEPT {}".format(repr(e)))
             url["note"] = repr(e)
     elapsed_time = time.time() - start_time
-    extractor.quit()
+    selected_extractor.quit()
     url_count = len(parser_urls["urls"])
     s_per_url = elapsed_time / url_count
-    print("{} FINISHED {:4d} urls in {:4d} seconds - {:6.2f} s/url [{}]".format(
-        datetime.datetime.now().isoformat(), url_count, int(elapsed_time), s_per_url, parser_urls["parser"]["url_regex"]))
+    print("{} FINISHED {:4d} urls in {:4d} seconds - {:5.2f} s/url [{}] {}".format(
+        datetime.datetime.now().isoformat()[:-3],
+        url_count,
+        int(elapsed_time),
+        s_per_url,
+        parser_name,
+        parser_urls["parser"]["url_regex"]))
     return parser_urls
 
 

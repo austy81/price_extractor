@@ -23,7 +23,8 @@ def _get_parser(url):
             "price_element": None,
             "verify_exists": None,
             "verify_not_exists": None,
-            "parser_cell_fill_bg_color": '000000FF'}  # blue is default - no parser
+            "parser_cell_fill_bg_color": '000000FF',  # blue is default - no parser
+            "parser_name": 'requests'}
 
 
 def _get_values_list(dict):

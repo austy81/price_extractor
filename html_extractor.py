@@ -1,6 +1,6 @@
 from selenium import webdriver
-import re
 import extraction_result_error
+import extract_price
 
 
 class HtmlExtractor():
@@ -45,21 +45,10 @@ class HtmlExtractor():
             element_text = self.driver.find_element_by_xpath(
                 price_element).text.encode('ascii', errors='ignore')
             return_val = None, extraction_result_error.ERROR_PARSING_PRICE
-            return self._get_price(element_text), None
+            return extract_price.clean(element_text), None
         except Exception:
             # self.driver.save_screenshot('screenshots/screenshot_{}.png'.format(strftime("%Y_%m_%d_%H_%M_%S")))
             return return_val
-
-    def _get_price(self, text):
-        text = text.decode('utf-8')
-        nums = re.findall(r"\d+", text.replace(" ", ""))
-        if len(nums) == 0:
-            return None  # "price element does not contain numbers"
-        if len(nums) == 1:
-            return int(nums[0])
-        if len(nums) == 2:
-            return float("{}.{}".format(nums[0], nums[1]))
-        return None  # "too many numeric values in price element"
 
     def quit(self):
         self.driver.quit()
